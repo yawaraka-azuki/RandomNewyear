@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>ルーレット</title>
+
+        <style>
+            body {
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                align-items: center; /* 縦中央 */
+                justify-content: center; /* 横中央 */
+                text-align: center;
+            }
+
+            #display {
+                font-size: 64px;
+                margin-bottom: 16px;
+            }
+
+            /* コントロール領域の高さを固定しておく */
+            #controls {
+                height: 70px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <div id="display">----</div>
+
+            <div id="controls">
+                <select id="wordSelect">
+                    <option value="あけおめ" selected>あけおめ</option>
+                    <option value="あけましておめでとう">
+                        あけましておめでとう
+                    </option>
+                    <option value="謹賀新年">謹賀新年</option>
+                    <option value="賀正">賀正</option>
+                </select>
+
+                <br /><br />
+
+                <button id="stopBtn">ストップ</button>
+            </div>
+        </div>
+
+        <script>
+            const INTERVAL_MS = 1;
+
+            let timerId = null;
+            let current = "----";
+            let text = "あけおめ";
+
+            const displayEl = document.getElementById("display");
+            const stopBtn = document.getElementById("stopBtn");
+            const wordSelect = document.getElementById("wordSelect");
+            const controlsEl = document.getElementById("controls");
+
+            function shuffleString(str) {
+                const arr = [...str];
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr.join("");
+            }
+
+            function tick() {
+                current = shuffleString(text);
+                displayEl.textContent = current;
+            }
+
+            function start() {
+                if (timerId !== null) return;
+                tick();
+                timerId = setInterval(tick, INTERVAL_MS);
+            }
+
+            function stop() {
+                if (timerId === null) return;
+                clearInterval(timerId);
+                timerId = null;
+
+                displayEl.textContent = current + "！！";
+
+                // 見えなくする（位置は保持）
+                controlsEl.style.visibility = "hidden";
+            }
+
+            wordSelect.addEventListener("change", () => {
+                text = wordSelect.value;
+            });
+
+            stopBtn.addEventListener("click", stop);
+
+            // ページ表示時に自動開始
+            text = wordSelect.value;
+            start();
+        </script>
+    </body>
+</html>
